@@ -401,28 +401,15 @@ function entity( entityConfig ) {
 export function entitiesConfig( state = rootEntitiesConfig, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES': {
-			const existingEntitiesMap = new Map();
-
-			state.forEach( ( currentEntity ) => {
-				if ( currentEntity.baseURL ) {
-					existingEntitiesMap.set(
-						currentEntity.baseURL,
-						currentEntity
-					);
-				}
-			} );
-
-			action.entities.forEach( ( newEntity ) => {
-				if (
-					newEntity.baseURL &&
-					existingEntitiesMap.has( newEntity.baseURL )
-				) {
-					existingEntitiesMap.delete( newEntity.baseURL );
-				}
-			} );
-
-			const existingEntities = Array.from( existingEntitiesMap.values() );
-			return [ ...existingEntities, ...action.entities ];
+			const filteredState = state.filter(
+				( currentEntity ) =>
+					! action.entities.some(
+						( newEntity ) =>
+							currentEntity.kind === newEntity.kind &&
+							currentEntity.name === newEntity.name
+					)
+			);
+			return [ ...filteredState, ...action.entities ];
 		}
 	}
 
